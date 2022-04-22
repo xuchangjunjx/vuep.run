@@ -1,17 +1,17 @@
-import Vue from 'vue';
-import copy from 'copy-text-to-clipboard';
-import { stringify } from 'query-string';
+import Vue from "vue";
+// import copy from "copy-text-to-clipboard";
+import { stringify } from "query-string";
 
-const API = 'https://text.cinwell.xyz';
+const API = "https://text.cinwell.xyz";
 
 export async function upload(text) {
-  Vue.toasted.show('Saving...');
+  Vue.toasted.show("Saving...");
 
   try {
     const result = await fetch(API, {
-      method: 'post',
+      method: "post",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
       },
       body: stringify({
         text,
@@ -24,8 +24,8 @@ export async function upload(text) {
     return await result.text();
   } catch (e) {
     Vue.toasted.clear();
-    Vue.toasted.show('Failed: ' + e.message, {
-      type: 'error',
+    Vue.toasted.show("Failed: " + e.message, {
+      type: "error",
       duration: 2000
     });
   }

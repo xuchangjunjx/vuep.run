@@ -5,19 +5,19 @@
 </template>
 
 <script>
-import createIframe from '@/utils/iframe';
+import createIframe from "@/utils/iframe";
 
 const sandboxAttributes = [
-  'allow-modals',
-  'allow-forms',
-  'allow-pointer-lock',
-  'allow-popups',
-  'allow-same-origin',
-  'allow-scripts'
+  "allow-modals",
+  "allow-forms",
+  "allow-pointer-lock",
+  "allow-popups",
+  "allow-same-origin",
+  "allow-scripts"
 ];
 
 export default {
-  props: ['value'],
+  props: ["value"],
 
   mounted() {
     this.iframe = createIframe({
@@ -34,5 +34,4 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-</style>
+<style lang="stylus" scoped></style>

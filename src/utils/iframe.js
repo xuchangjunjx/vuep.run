@@ -13,10 +13,10 @@ class Iframe {
   setHTML(obj) {
     let html;
 
-    if (typeof obj === 'string') {
+    if (typeof obj === "string") {
       html = obj;
     } else {
-      const { head = '', body = '' } = obj;
+      const { head = "", body = "" } = obj;
       html = `<!DOCTYPE html><html><head>${head}</head><body>${body}</body></html>`;
     }
 
@@ -31,12 +31,12 @@ class Iframe {
   }
 
   createIframe() {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('sandbox', this.sandboxAttributes.join(' '));
-    iframe.setAttribute('scrolling', 'yes');
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = '0';
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("sandbox", this.sandboxAttributes.join(" "));
+    iframe.setAttribute("scrolling", "yes");
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "0";
     return iframe;
   }
 }

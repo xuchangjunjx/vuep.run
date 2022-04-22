@@ -1,11 +1,11 @@
-import qs from 'query-string';
-import deepmerge from 'deepmerge';
+import qs from "query-string";
+import deepmerge from "deepmerge";
 
 const DEFAULT_PARAMS = {
   pkgs: [],
   css: [],
-  cdn: 'unpkg',
-  vue: ''
+  cdn: "unpkg",
+  vue: ""
 };
 
 let params = DEFAULT_PARAMS;
@@ -14,8 +14,8 @@ function getArr(str) {
   if (Array.isArray(str)) {
     return str;
   }
-  if (typeof str === 'string') {
-    return str.split(',');
+  if (typeof str === "string") {
+    return str.split(",");
   }
   return [];
 }
@@ -28,7 +28,7 @@ export function parse(str) {
   try {
     merge(JSON.parse(str));
   } catch (e) {
-    console.error('error', e.message);
+    console.error("error", e.message);
   }
 }
 

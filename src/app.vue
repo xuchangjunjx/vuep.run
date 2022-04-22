@@ -138,7 +138,9 @@ export default {
       const { pkgs, css, cdn, vue } = params.get();
       const prefix = CDN_MAP[cdn] || CDN_MAP.unpkg;
       // debugger;
-      return [`<script src='/vue.js'><\/script>`].concat(
+      return [
+        `<script src='${process.env.BASE_URL}assets/vue.js'><\/script>`
+      ].concat(
         []
           // .concat(vue ? "vue@" + vue : "vue@2", pkgs)
           .concat(pkgs) // vue依赖不使用cdn

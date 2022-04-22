@@ -5,32 +5,18 @@
   "private": true,
   "description": "🏃 An online playground for Vue",
   "main": "src/main.js",
-  "scripts": {
-    "dev": "poi",
-    "build": "poi build"
-  },
   "keywords": [
     "vue",
     "editor"
   ],
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
   "author": "qingwei-li <cinwell.li@gmail.com> (https://github.com/QingWei-Li)",
   "repository": "QingWei-Li/vuep.run",
   "license": "MIT",
-  "poi": {
-    "devServer": {
-      "historyApiFallback": {
-        "disableDotRule": true
-      }
-    },
-    "transformModules": [
-      "@emmetio",
-      "query-string",
-      "strict-uri-encode",
-      "parse-package-name",
-      "copy-text-to-clipboard"
-    ],
-    "homepage": "/"
-  },
   "homepage": "https://vuep.run",
   "dependencies": {
     "@emmetio/codemirror-plugin": "^0.5.0",
@@ -48,8 +34,18 @@
     "vue-toasted": "^1.1.24"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.6.3",
+    "@vue/cli-plugin-babel": "^4.5.13",
+    "@vue/cli-plugin-eslint": "^4.5.13",
+    "@vue/cli-service": "^4.5.13",
+    "@vue/eslint-config-prettier": "^4.0.1",
+    "eslint": "^5.8.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "babel-eslint": "^10.0.1",
     "modern-normalize": "^0.4.0",
-    "poi": "^9.6.13",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2"
   }
