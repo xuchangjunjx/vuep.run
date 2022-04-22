@@ -38,6 +38,7 @@
     "copy-text-to-clipboard": "^1.0.4",
     "deepmerge": "^2.1.0",
     "is-absolute-url": "^2.1.0",
+    "less": "^4.1.2",
     "parse-package-name": "^0.1.0",
     "query-string": "^6.0.0",
     "throttle-debounce": "^1.0.1",

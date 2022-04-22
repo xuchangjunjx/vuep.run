@@ -8,30 +8,40 @@
           <a target="_blank" href="//github.com/qingwei-li/vuep.run">GitHub</a>
         </li>
       </ul>
-      <button @click="upload" class="save">Save</button>
+      <button @click="run" class="save">run</button>
     </nav>
 
     <main class="main">
-      <editor class="panel" @change="compile"></editor>
+      <editor class="panel" ref="editor" @change="compile"></editor>
       <preview :value="preview" class="panel"></preview>
     </main>
   </section>
 </template>
 
 <script>
-import Editor from '@/components/editor';
-import Preview from '@/components/preview';
-import { parseComponent } from 'vue-template-compiler/browser';
-import { parse as queryParse } from 'query-string';
-import getImports from '@/utils/get-imports';
-import getPkgs from '@/utils/get-pkgs';
-import isAbsouteUrl from 'is-absolute-url';
-import { upload } from '@/utils/store';
-import * as params from '@/utils/params';
-
+import Editor from "@/components/editor";
+import Preview from "@/components/preview";
+import { parseComponent } from "vue-template-compiler/browser";
+import { parse as queryParse } from "query-string";
+import getImports from "@/utils/get-imports";
+import getPkgs from "@/utils/get-pkgs";
+import isAbsouteUrl from "is-absolute-url";
+import { upload } from "@/utils/store";
+import * as params from "@/utils/params";
+function getLess() {
+  try {
+    return require("less");
+  } catch (error) {
+    console.error(error);
+    // eslint-disable-next-line consistent-return
+    return {
+      render: () => {}
+    };
+  }
+}
 const CDN_MAP = {
-  unpkg: '//unpkg.com/',
-  jsdelivr: '//cdn.jsdelivr.net/npm/'
+  unpkg: "//unpkg.com/",
+  jsdelivr: "//cdn.jsdelivr.net/npm/"
 };
 
 export default {
@@ -41,8 +51,8 @@ export default {
   },
 
   data: () => ({
-    preview: '',
-    code: ''
+    preview: "",
+    code: ""
   }),
 
   methods: {
@@ -56,19 +66,19 @@ export default {
       const { template, script, styles, customBlocks } = parseComponent(code);
       let config;
 
-      if ((config = customBlocks.find(n => n.type === 'config'))) {
+      if ((config = customBlocks.find(n => n.type === "config"))) {
         params.clear();
         params.parse(config.content);
       }
 
       let compiled;
       const pkgs = [];
-      let scriptContent = 'exports = { default: {} }';
+      let scriptContent = "exports = { default: {} }";
 
       if (script) {
         try {
           compiled = window.Babel.transform(script.content, {
-            presets: ['es2015', 'es2016', 'es2017', 'stage-0'],
+            presets: ["es2015", "es2016", "es2017", "stage-0"],
             plugins: [[getImports, { imports }]]
           }).code;
         } catch (e) {
@@ -83,16 +93,27 @@ export default {
 
       pkgs.forEach(pkg => {
         scripts.push(
-          `<script src=//packd.now.sh/${pkg.module}${pkg.path}?name=${
-            pkg.name
-          }><\/script>`
+          `<script src=//packd.now.sh/${pkg.module}${pkg.path}?name=${pkg.name}><\/script>`
         );
       });
 
-      styles.forEach(style => {
-        heads.push(`<style>${style.content}</style>`);
-      });
+      for (let style of styles) {
+        let { lang, content } = style;
+        let result = content;
+        if (lang) {
+          // 样式预处理
+          switch (lang) {
+            case "less":
+              let compiledCss = await getLess().render(content);
+              result = compiledCss.css;
+              break;
+            default:
+              break;
+          }
+        }
 
+        heads.push(`<style>${result}</style>`);
+      }
       scripts.push(`
       <script>
         var exports = {};
@@ -106,50 +127,52 @@ export default {
       <\/script>`);
 
       this.preview = {
-        head: heads.join('\n'),
-        body: '<div id="app"></div>' + scripts.join('\n')
+        head: heads.join("\n"),
+        body: '<div id="app"></div>' + scripts.join("\n")
       };
     },
 
     genHeads() {
-      let heads = [];
-
       params.queryParse(location.search);
 
       const { pkgs, css, cdn, vue } = params.get();
       const prefix = CDN_MAP[cdn] || CDN_MAP.unpkg;
-
-      return [].concat(
+      // debugger;
+      return [`<script src='/vue.js'><\/script>`].concat(
         []
-          .concat(vue ? 'vue@' + vue : 'vue', pkgs)
+          // .concat(vue ? "vue@" + vue : "vue@2", pkgs)
+          .concat(pkgs) // vue依赖不使用cdn
           .map(
             pkg =>
-              `<script src=${isAbsouteUrl(pkg) ? '' : prefix}${pkg}><\/script>`
+              `<script src=${isAbsouteUrl(pkg) ? "" : prefix}${pkg}><\/script>`
           ),
         css.map(
           item =>
             `<link rel=stylesheet href=${
-              isAbsouteUrl(item) ? '' : prefix
+              isAbsouteUrl(item) ? "" : prefix
             }${item}>`
         )
       );
     },
-
+    run() {
+      // 手动触发
+      this.$refs.editor.emitChange();
+    },
     async upload() {
       if (!this.code) {
-        this.$toasted('No content', {
-          type: 'error'
+        this.$toasted("No content", {
+          type: "error"
         });
         return;
       }
 
       const id = await upload(this.code);
-      history.pushState({}, '', '/' + id);
+      history.pushState({}, "", "/" + id);
       const url = location.href;
 
       this.$toasted.show(`Hosting in ${url}`, {
         action: {
-          text: 'Copy',
+          text: "Copy",
           onClick() {
             copy(url);
             Vue.toasted.clear();

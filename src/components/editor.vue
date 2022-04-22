@@ -1,21 +1,20 @@
 <template>
   <div class="editor">
-    <textarea ref="textarea" class="editor">
-    </textarea>
+    <textarea ref="textarea" class="editor"> </textarea>
   </div>
 </template>
 
 <script>
-import CodeMirror from 'codemirror';
-import emmet from '@emmetio/codemirror-plugin';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/lucario.css';
-import 'codemirror/addon/selection/active-line';
-import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/mode/vue/vue';
-import { debounce } from 'throttle-debounce';
-import isAbsouteUrl from 'is-absolute-url';
-import { downloadURL } from '@/utils/store';
+import CodeMirror from "codemirror";
+import emmet from "@emmetio/codemirror-plugin";
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/lucario.css";
+import "codemirror/addon/selection/active-line";
+import "codemirror/addon/edit/matchbrackets";
+import "codemirror/mode/vue/vue";
+import { debounce } from "throttle-debounce";
+import isAbsouteUrl from "is-absolute-url";
+import { downloadURL } from "@/utils/store";
 
 emmet(CodeMirror);
 const defaultValue = `<template>
@@ -44,9 +43,10 @@ export default {
 }
 <\/script>
 
-<style>
+<style lang='less' scoped>
+@color:#2c3e50;
 div {
-  color: #2c3e50;
+  color: @color;
   font-family: Arial, sans-serif;
 }
 
@@ -56,13 +56,42 @@ a {
 </style>`;
 
 export default {
+  props: {
+    autoRender: Boolean
+  },
   data: () => ({
-    code: ''
+    code: "",
+    editor: null
   }),
 
   methods: {
+    initCodeEdit() {
+      this.editor = CodeMirror.fromTextArea(this.$refs.textarea, {
+        mode: "vue",
+        theme: "lucario",
+        value: `<template></template>`,
+        lineNumbers: true,
+        tabSize: 2,
+        autofocus: true,
+        line: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        extraKeys: {
+          Tab: "emmetExpandAbbreviation",
+          Enter: "emmetInsertLineBreak"
+        }
+      });
+      if (this.autoRender) {
+        this.editor.on(
+          "change",
+          debounce(500, () => {
+            this.$emit("change", editor.getValue());
+          })
+        );
+      }
+    },
     async getFileContent(filename) {
-      this.$toasted.show('Loading file...');
+      this.$toasted.show("Loading file...");
 
       let url;
       if (/^\w+$/.test(filename)) {
@@ -70,21 +99,21 @@ export default {
       } else if (isAbsouteUrl(filename)) {
         url = filename;
       } else if (/^[\w-]+\.\w+/.test(filename)) {
-        url = '//' + filename;
+        url = "//" + filename;
       } else {
         // convert url to github raw url
         const repo = filename.match(
           /^([^\/]+\/[^\/]+)(\/blob\/([\w-]+))?(\S+)$/
         );
-        url = `//raw.githubusercontent.com/${repo[1]}/${repo[3] || 'master'}${
+        url = `//raw.githubusercontent.com/${repo[1]}/${repo[3] || "master"}${
           repo[4]
         }`;
       }
 
       if (/github\.com\//.test(url)) {
         url = url
-          .replace(/github\.com\//, 'raw.githubusercontent.com/')
-          .replace(/\/blob\//, '/');
+          .replace(/github\.com\//, "raw.githubusercontent.com/")
+          .replace(/\/blob\//, "/");
       }
 
       try {
@@ -95,47 +124,35 @@ export default {
         return await result.text();
       } catch (e) {
         this.$toasted.clear();
-        this.$toasted.show('File not found', {
-          type: 'error',
+        this.$toasted.show("File not found", {
+          type: "error",
           duration: 2000
         });
         return null;
+      }
+    },
+    setCode(code) {
+      if (this.editor) {
+        this.editor.setValue(code);
+      }
+    },
+    emitChange() {
+      if (this.editor) {
+        this.$emit("change", this.editor.getValue());
       }
     }
   },
 
   async mounted() {
-    const editor = CodeMirror.fromTextArea(this.$refs.textarea, {
-      mode: 'vue',
-      theme: 'lucario',
-      value: `<template></template>`,
-      lineNumbers: true,
-      tabSize: 2,
-      autofocus: true,
-      line: true,
-      styleActiveLine: true,
-      matchBrackets: true,
-      extraKeys: {
-        Tab: 'emmetExpandAbbreviation',
-        Enter: 'emmetInsertLineBreak'
-      }
-    });
-
-    editor.on(
-      'change',
-      debounce(200, () => {
-        this.$emit('change', editor.getValue());
-      })
-    );
+    this.initCodeEdit();
 
     let value;
-    if (location.pathname !== '/') {
+    if (location.pathname !== "/") {
       value = await this.getFileContent(location.pathname.slice(1));
     }
     value = value || defaultValue;
-    editor.setValue(value);
-
-    this.$emit('change', editor.getValue());
+    this.setCode(value);
+    this.emitChange();
   }
 };
 </script>
