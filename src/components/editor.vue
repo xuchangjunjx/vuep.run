@@ -144,11 +144,11 @@ export default {
   async mounted() {
     this.initCodeEdit();
 
-    let value;
-    if (location.pathname !== "/") {
-      value = await this.getFileContent(location.pathname.slice(1));
-    }
-    value = value || defaultValue;
+    // let value;
+    // if (location.pathname !== "/") {
+    //   value = await this.getFileContent(location.pathname.slice(1));
+    // }
+    let value = value || defaultValue;
     this.setCode(value);
     this.emitChange();
   }
